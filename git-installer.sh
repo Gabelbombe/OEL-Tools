@@ -13,4 +13,5 @@ fi
 cd /tmp
 wget http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
 rpm -Uvh ./epel-release-5-4.noarch.rpm
+
 yum install git
