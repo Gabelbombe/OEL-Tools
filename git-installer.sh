@@ -10,6 +10,11 @@ if [[ $EUID -ne 0 ]]; then
   echo "This script must be run as su" 1>&2 ; exit 1
 fi
 
+## Enable dynamic IP allocation
+sed -i -e 's/ONBOOT=no/ONBOOT=yes/' /etc/sysconfig/networ-scripts/ifcfg-eth0
+/etc/init.d/network restart
+
+
 cd /tmp
 wget http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
 rpm -Uvh ./epel-release-5-4.noarch.rpm
