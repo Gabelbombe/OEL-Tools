@@ -77,27 +77,55 @@ yum install -y expect
 echo "==> Creating Vagrant user"
 groupadd admin
 useradd -G admin vagrant
-/usr/bin/expect -cd 'expect { 
-  eval spawn passwd vagrant 
-  set prompt ":|#|\\\$"                       ## use correct prompt
-  interact -o -nobuffer -re $prompt return    ## must be done twice due to week passwd
-  send "vagrant\r"
-  interact -o -nobuffer -re $prompt return
-  send "vagrant\r"
-  interact
-}'
+
+PASSWD=$(expect -Dc '
+  log_user 0
+  proc abort {} {
+    puts "Error with setting password?"
+    exit 1
+  }
+  spawn passwd vagrant
+  expect {
+    password:        { send "vagrant\r" }
+    default          abort
+  }
+  expect {
+    password:        { send "vagrant\r" }
+    default          abort
+    eof
+  }
+  puts "User Vagrant has had password set..."
+')
+
+echo "==> $PASSWD"
 
 
-echo "Changing Vagrant users permissions"
-
+echo "==> Changing Vagrant users permissions"
 cp /etc/sudoers /etc/sudoers.shtf ## Failsafe
 echo -e '%admin      ALL=(ALL)     NOPASSWD: ALL\nDefaults    env_keep = .. SSH_AUTH_SOCK PATH' >> /etc/sudoers
 sed -i -e 's/Defaults(.*)requiretty/# Defaults\1requiretty/g' \
        -e 's/Defaults(.*)!visible/# Defaults\1!visible/g' /etc/sudoers
 
+
+echo "==> Changing Vagrant \$PATH envvars"
+sudo -u vagrant echo 'export PATH=$PATH:/usr/sbin:/sbin' >> /home/vagrant.bashrc
+/etc/init.d/sudo restart
+
+## RVM Requirements
+yum install -y gcc-c++ patch readline zlib make bzip2 autoconf automake libtool bison \
+               {readline,zlib,libyaml,libffi,openssl,iconv}-devel
+
+su vagrant <<EOF
+  cd /tmp 
+  gpg  --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
+  curl -sSL https://get.rvm.io |bash -s stable --ruby
+EOF
+
+
+
 echo "==> Provisions successful, rebooting in..."
   
-  for i in {5..1}; do echo -n "$i. " && sleep 1; done
+#  for i in {5..1}; do echo -n "$i. " && sleep 1; done
 
-shutdown -rq now
+#shutdown -rq now
 
