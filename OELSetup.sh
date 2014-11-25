@@ -58,11 +58,9 @@ echo -e "search unix.gsm1900.org gsm1900.org voicestream.com\nnameserver 10.130.
 
 ## Guest Editions VM ISO
 echo "==> Attempting to add Virtualbox Guest Additions"
-eject -T
-
 cd /tmp && wget http://dlc.sun.com.edgesuite.net/virtualbox/4.3.18/VBoxGuestAdditions_4.3.18.iso
 mkdir -p /media/ISO
-mount -o loop VBoxGuestAdditions_4.3.18.iso /media/ISO
+mount -o loop VBoxGruestAdditions_4.3.18.iso /media/ISO
 
 if [ -f "/media/ISO/VBoxLinuxAdditions.run" ]; then
   echo "==> Mounting Successful!"
@@ -115,7 +113,7 @@ PASSWD=$(expect -c '
 echo "==> $PASSWD" ## Outputs Expect
 echo "==> Changing Vagrant users permissions"
 cp /etc/sudoers /etc/sudoers.shtf ## Failsafe
-echo -e '##Vagrant User\n%admin      ALL=(ALL)\tNOPASSWD: ALL\n\Defaults   env_keep += "SSH_AUTH_SOCK"' >> /etc/sudoers
+echo -e '##Vagrant User\n%admin      ALL=(ALL)\tNOPASSWD: ALL\nDefaults   env_keep += "SSH_AUTH_SOCK"' >> /etc/sudoers
 sed -i -e 's/Defaults(.*)requiretty/# Defaults\1requiretty/g' \
        -e 's/Defaults(.*)!visible/# Defaults\1!visible/g' /etc/sudoers
 
@@ -151,7 +149,7 @@ yum install -y puppet openssh-{server,client}
 echo '==> Adding SSH key for Puppet'
 su vagrant <<EOF
   cd /tmp 
-  mkdir -p .ssh && sudo chmod 0755 ~/.ssh 
+  mkdir -p ~/.ssh && sudo chmod 0755 ~/.ssh 
   wget --no-check-certificate -O vagrant.pub http://goo.gl/x390M8
   cat vagrant.pub >> ~/.ssh/authorized_keys 
   sudo chmod 0644 ~/.ssh/authorized_keys
