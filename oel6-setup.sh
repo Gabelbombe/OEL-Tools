@@ -1,21 +1,15 @@
 #!/bin/bash
-# Oracle Linux 6 Vagrant Primer
+# Oracle Linux 5/6 Virtualbox Primer
 
 # CPR : Jd Daniel :: Ehime-ken
-# MOD : 2014-11-21 @ 11:44:00
+# MOD : 2014-11-25 @ 13:02:25
 # REF : //pyfunc.blogspot.com/2011/11/creating-base-box-from-scratch-for.html
-# INP : curl -sSL setup.sh http://goo.gl/DGs3Fv |bash
+# INP : curl -sSL http://goo.gl/DGs3Fv |bash
 
-################
-# Fix hostname #
-################
-
-#################
-# Root Password #
-#   g0tsh0t3    #
-#################
-
-# Basic Server
+#TODO : Fix hostname
+#TODO : Setup for -> Basic Server
+#TODO : Virtualbox doesn't like sending emails, anway around this?
+#TODO : Test OEL 5U11
 
 
 ## Will most likely need to be done initially 
@@ -38,7 +32,6 @@ yum groupinstall -y "GNOME Desktop Environment" "X Window System" "Desktop"
 declare -A services
 
 services=(
-  ['Discover Daemon']='avahi-daemon'
   ['Network Manager']='NetworkManager'
   ['Firewall Daemon']='iptables'
   ['Printer Daemon']='cups'
