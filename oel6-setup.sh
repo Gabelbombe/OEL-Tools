@@ -6,8 +6,6 @@
 # REF : //pyfunc.blogspot.com/2011/11/creating-base-box-from-scratch-for.html
 # INP : wget -O setup.sh http://goo.gl/DGs3Fv |bash
 
-set -x
-
 ################
 # Fix hostname #
 ################
@@ -90,21 +88,14 @@ eject -T
 cd /tmp && wget http://dlc.sun.com.edgesuite.net/virtualbox/4.3.18/VBoxGuestAdditions_4.3.18.iso
 mkdir -p /media/ISO
 mount -o loop VBoxGuestAdditions_4.3.18.iso /media/ISO
-ln -s /opt/VBoxGuestAdditions-4.3.18/lib/VBoxGuestAdditions /usr/lib/VBoxGuestAdditions
 
-set -e
+if [ -f "/media/ISO/VBoxLinuxAdditions.run" ]; then
+  echo "==> Mounting Successful!"
+  yum install -y kernel-uek-devel kernel-uek-headers kernel-uek-devel-$(uname -r) ## Kernel Headers needed by guest additions
+  bash /media/ISO/VBoxLinuxAdditions.run --nox11
+fi
 
-  if [ -f "/media/ISO/VBoxLinuxAdditions.run" ]; then
-    echo "==> Mounting Successful!"
-    yum install -y kernel-uek-devel kernel-uek-headers kernel-uek-devel-$(uname -r) ## Kernel Headers needed by guest additions
-    bash /media/ISO/VBoxLinuxAdditions.run --nox11
-  else
-    echo 'Something borked?...'
-    exit 1
-  fi
-
-set +e
-
+eject -T
 
 ## Installing Expect
 yum install -y expect
