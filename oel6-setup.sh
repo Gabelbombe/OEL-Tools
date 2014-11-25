@@ -29,24 +29,6 @@ sed -i -e 's/ONBOOT=no/ONBOOT=yes/' /etc/sysconfig/network-scripts/ifcfg-eth0
 ## ##
 ## ##
 
-echo "==> Changing root passwd"
-PASSWD=$(expect -c '
-  log_user 0
-  proc abort {} {
-    puts "User Root has had password set..."
-    exit 0
-  }
-  spawn passwd
-  expect {
-    password:        { send "g0tsh0t3\r"; exp_continue }
-    default          end
-    eof
-  }
-')
-
-echo "==> $PASSWD" ## Outputs Expect
-unset PASSWD
-
 ## X Windows is req'd by VB Guest Additions
 echo "==> Installing X"
 yum groupinstall -y "GNOME Desktop Environment" "X Window System" "Desktop"
@@ -100,6 +82,22 @@ eject -T
 ## Installing Expect
 yum install -y expect
 
+echo "==> Changing root passwd"
+PASSWD=$(expect -c '
+  log_user 0
+  proc abort {} {
+    puts "User Root has had password set..."
+    exit 0
+  }
+  spawn passwd
+  expect {
+    password:        { send "g0tsh0t3\r"; exp_continue }
+    default          end
+    eof
+  }
+')
+
+echo "==> $PASSWD" ## Outputs Expect
 
 ## Create generic(s) for Vagrant
 echo "==> Creating Vagrant user"
