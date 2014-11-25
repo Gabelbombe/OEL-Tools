@@ -4,7 +4,7 @@
 # CPR : Jd Daniel :: Ehime-ken
 # MOD : 2014-11-21 @ 11:44:00
 # REF : //pyfunc.blogspot.com/2011/11/creating-base-box-from-scratch-for.html
-# INP : wget -O setup.sh http://goo.gl/DGs3Fv |bash
+# INP : curl -sSL setup.sh http://goo.gl/DGs3Fv |bash
 
 ################
 # Fix hostname #
