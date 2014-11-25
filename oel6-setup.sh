@@ -4,8 +4,9 @@
 # CPR : Jd Daniel :: Ehime-ken
 # MOD : 2014-11-21 @ 11:44:00
 # REF : //pyfunc.blogspot.com/2011/11/creating-base-box-from-scratch-for.html
-# INP : wget http://goo.gl/DGs3Fv |bash
+# INP : wget -O setup.sh http://goo.gl/DGs3Fv |bash
 
+set -x
 
 ################
 # Fix hostname #
@@ -30,19 +31,24 @@ sed -i -e 's/ONBOOT=no/ONBOOT=yes/' /etc/sysconfig/network-scripts/ifcfg-eth0
 ## ##
 ## ##
 
+## X Windows is req'd by VB Guest Additions
+echo "==> Installing X"
+yum groupinstall -y "GNOME Desktop Environment" "X Window System" "Desktop"
+
+
 ## Shut off useless services
 declare -A services
 
 services=(
-  ['Discover Daemon']='avahi-daemon'
+#  ['Discover Daemon']='avahi-daemon'    # Does not exist?
+#  ['Network Manager']='NetworkManager'  # Does not exist?
   ['Firewall Daemon']='iptables'
   ['Printer Daemon']='cups'
-  ['Network Manager']='NetworkManager'
   ['IPv6 packet filtering']='ip6tables'
 )
 
 ## If firewall chains exist... 
-if ! hash ipchains 2>/dev/null; then
+if hash ipchains 2>/dev/null; then
   services['Chains Daemon']='ipchains'
   service ipchains stop
 fi
@@ -63,19 +69,19 @@ echo -e "search unix.gsm1900.org gsm1900.org voicestream.com\nnameserver 10.130.
 echo "==> Attempting to add Virtualbox Guest Additions"
 eject -T
 
-read -p "Please mount 'VBoxGuestAddtions.iso', then press [Enter]" -n1 -s
-mkdir -p /media/cdrom
-mount -t iso9660 /dev/cdrom /media/cdrom
-
+cd /tmp && wget http://dlc.sun.com.edgesuite.net/virtualbox/4.3.18/VBoxGuestAdditions_4.3.18.iso
+mkdir -p /media/ISO
+mount -o loop VBoxGuestAdditions_4.3.18.iso /media/ISO
+ln -s /opt/VBoxGuestAdditions-4.3.18/lib/VBoxGuestAdditions /usr/lib/VBoxGuestAdditions
 
 set -e
 
-  if [ -f "/media/cdrom/VBoxLinuxAdditions.run" ]; then
+  if [ -f "/media/ISO/VBoxLinuxAdditions.run" ]; then
     echo "==> Mounting Successful!"
     yum install -y kernel-uek-devel kernel-uek-headers kernel-uek-devel-$(uname -r) ## Kernel Headers needed by guest additions
     bash /media/cdrom/VBoxLinuxAdditions.run --nox11
   else
-    echo 'Something borked?\nPlease try: $ mount -t iso9660 /dev/cdrom /media/cdrom\nafter inserting guest additions cd....'
+    echo 'Something borked?...'
     exit 1
   fi
 
