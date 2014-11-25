@@ -97,7 +97,7 @@ set -e
   if [ -f "/media/ISO/VBoxLinuxAdditions.run" ]; then
     echo "==> Mounting Successful!"
     yum install -y kernel-uek-devel kernel-uek-headers kernel-uek-devel-$(uname -r) ## Kernel Headers needed by guest additions
-    bash /media/cdrom/VBoxLinuxAdditions.run --nox11
+    bash /media/ISO/VBoxLinuxAdditions.run --nox11
   else
     echo 'Something borked?...'
     exit 1
