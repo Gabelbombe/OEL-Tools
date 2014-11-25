@@ -4,13 +4,31 @@
 # CPR : Jd Daniel :: Ehime-ken
 # MOD : 2014-11-21 @ 11:44:00
 # REF : //pyfunc.blogspot.com/2011/11/creating-base-box-from-scratch-for.html
-# INP : wget http://goo.gl/??? |bash
+# INP : wget http://goo.gl/DGs3Fv |bash
 
+
+################
+# Fix hostname #
+################
+
+#################
+# Root Password #
+#   g0tsh0t3    #
+#################
+
+# Basic Server
+
+
+## Will most likely need to be done initially 
+## from the box as there is NO CONNECTION
 
 ## Enable dynamic IP allocation
 echo "==> Enabling VM networking"
-sed -i -e 's/ONBOOT=no/ONBOOT=yes/' /etc/sysconfig/networ-scripts/ifcfg-eth0
+sed -i -e 's/ONBOOT=no/ONBOOT=yes/' /etc/sysconfig/network-scripts/ifcfg-eth0
 /etc/init.d/network restart
+
+## ##
+## ##
 
 ## Shut off useless services
 declare -A services
@@ -33,7 +51,7 @@ service iptables stop
 
 for service in "${!services[@]}"; do
   echo "==> Disableing: $service"
-  chkonfig "${services[$service]}" off
+  chkconfig "${services[$service]}" off
 done
 
 ## Prime resolv.conf
