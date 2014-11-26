@@ -4,7 +4,7 @@
 # CPR : Jd Daniel :: Ehime-ken
 # MOD : 2014-11-25 @ 13:02:25
 # REF : //pyfunc.blogspot.com/2011/11/creating-base-box-from-scratch-for.html
-# INP : curl -sSL http://goo.gl/DGs3Fv |bash
+# INP : curl -sSL http://goo.gl/H0Ff3M |bash
 
 #TODO : Fix hostname
 #TODO : Setup for -> Basic Server
@@ -16,16 +16,29 @@
 ## from the box as there is NO CONNECTION
 
 ## Enable dynamic IP allocation
-echo "==> Enabling VM networking"
+echo "\n==> Enabling VM networking"
 sed -i -e 's/ONBOOT=no/ONBOOT=yes/' /etc/sysconfig/network-scripts/ifcfg-eth0
 /etc/init.d/network restart
 
-## ##
-## ##
 
-## X Windows is req'd by VB Guest Additions
-echo "==> Installing X"
-yum groupinstall -y "GNOME Desktop Environment" "X Window System" "Desktop"
+## Guest Editions VM ISO
+echo "\n==> Attempting to add Virtualbox Guest Additions"
+
+mkdir -p /media/ISO
+curl -sSL -o /tmp/VBoxGruestAdditions_4.3.18.iso http://goo.gl/wIbFkq
+mount -o loop /tmp/VBoxGruestAdditions_4.3.18.iso /media/ISO
+
+###
+### Needs reboot to find, will show up in
+###
+
+if [ -f "/media/ISO/VBoxLinuxAdditions.run" ]; then
+  echo "\n==> Mounting Successful!"
+  yum install -y kernel-headers kernel-devel kernel-uek-devel-$(uname -r) binutils gcc make dkms
+  bash /media/ISO/VBoxLinuxAdditions.run --nox11
+fi
+
+eject -T
 
 
 ## Shut off useless services
@@ -47,33 +60,19 @@ fi
 service iptables stop
 
 for service in "${!services[@]}"; do
-  echo "==> Disableing: $service"
+  echo "\n==> Disableing: $service"
   chkconfig "${services[$service]}" off
 done
 
 ## Prime resolv.conf
-echo "==> Priming resolve.conf"
+echo "\n==> Priming resolve.conf"
 echo -e "search unix.gsm1900.org gsm1900.org voicestream.com\nnameserver 10.130.32.52\nnameserver 10.14.6.85\nretry:1\nretrans:1" \
 > /etc/resolv.conf
-
-## Guest Editions VM ISO
-echo "==> Attempting to add Virtualbox Guest Additions"
-cd /tmp && wget http://dlc.sun.com.edgesuite.net/virtualbox/4.3.18/VBoxGuestAdditions_4.3.18.iso
-mkdir -p /media/ISO
-mount -o loop VBoxGruestAdditions_4.3.18.iso /media/ISO
-
-if [ -f "/media/ISO/VBoxLinuxAdditions.run" ]; then
-  echo "==> Mounting Successful!"
-  yum install -y kernel-uek-devel kernel-uek-headers kernel-uek-devel-$(uname -r) ## Kernel Headers needed by guest additions
-  bash /media/ISO/VBoxLinuxAdditions.run --nox11
-fi
-
-eject -T
 
 ## Installing Expect
 yum install -y expect
 
-echo "==> Changing root passwd"
+echo "\n==> Changing root passwd"
 PASSWD=$(expect -c '
   log_user 0
   proc abort {} {
@@ -88,10 +87,10 @@ PASSWD=$(expect -c '
   }
 ')
 
-echo "==> $PASSWD" ## Outputs Expect
+echo "\n==> $PASSWD" ## Outputs Expect
 
 ## Create generic(s) for Vagrant
-echo "==> Creating Vagrant user"
+echo "\n==> Creating Vagrant user"
 groupadd admin
 useradd -G admin vagrant
 
@@ -110,8 +109,8 @@ PASSWD=$(expect -c '
 ')
 
 
-echo "==> $PASSWD" ## Outputs Expect
-echo "==> Changing Vagrant users permissions"
+echo "\n==> $PASSWD" ## Outputs Expect
+echo "\n==> Changing Vagrant users permissions"
 cp /etc/sudoers /etc/sudoers.shtf ## Failsafe
 echo -e '##Vagrant User\n%admin      ALL=(ALL)\tNOPASSWD: ALL\nDefaults   env_keep += "SSH_AUTH_SOCK"' >> /etc/sudoers
 sed -i -e 's/Defaults(.*)requiretty/# Defaults\1requiretty/g' \
@@ -125,7 +124,7 @@ EOF
 
 ## RVM Requirements
 echo '==> Installing RVM requirements'
-yum install -y gcc-c++ patch readline zlib make bzip2 autoconf automake libtool bison \
+yum install -y gcc-c++ patch readline zlib bzip2 autoconf automake libtool bison \
                {readline,zlib,libyaml,libffi,openssl,iconv}-devel
 
 echo '==> Installing RVM'
@@ -171,11 +170,11 @@ EOF
 read -p "Boxes MAC Address is: '$(ifconfig |grep eth0 |awk '{print$5}')' please write this down, then press [Enter]" -n1 -s
 
 
-echo "==> Running cleanup"
+echo "\n==> Running cleanup"
 yum clean -y headers packages dbcache expire-cache
 
 
-echo "==> Provisions successful, rebooting box in..."
+echo "\n==> Provisions successful, rebooting box in..."
   
   for i in {5..1}; do echo -n "$i. " && sleep 1; done
 
