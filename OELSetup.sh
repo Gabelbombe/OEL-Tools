@@ -4,7 +4,7 @@
 # CPR : Jd Daniel :: Ehime-ken
 # MOD : 2014-11-25 @ 13:02:25
 # REF : //pyfunc.blogspot.com/2011/11/creating-base-box-from-scratch-for.html
-# INP : curl -sSL http://goo.gl/H0Ff3M |bash
+# INP : curl -sSL http://goo.gl/H0Ff3M |script -c 'bash' -q /dev/null
 
 #TODO : Fix hostname
 #TODO : Setup for -> Basic Server
@@ -112,7 +112,17 @@ PASSWD=$(expect -c '
 echo "\n==> $PASSWD" ## Outputs Expect
 echo "\n==> Changing Vagrant users permissions"
 cp /etc/sudoers /etc/sudoers.shtf ## Failsafe
-echo -e '##Vagrant User\n%admin      ALL=(ALL)\tNOPASSWD: ALL\nDefaults   env_keep += "SSH_AUTH_SOCK"' >> /etc/sudoers
+
+echo -e '
+##Vagrant User
+%admin           ALL=(ALL) NOPASSWD:ALL
+vagrant          ALL=(ALL) NOPASSWD:ALL
+Defaults:vagrant !requiretty
+Defaults         env_keep += "SSH_AUTH_SOCK"
+' >> /etc/sudoers
+
+
+#!! Not run?
 sed -i -e 's/Defaults(.*)requiretty/# Defaults\1requiretty/g' \
        -e 's/Defaults(.*)!visible/# Defaults\1!visible/g' /etc/sudoers
 

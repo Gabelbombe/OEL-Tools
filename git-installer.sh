@@ -16,7 +16,7 @@ sed -i -e 's/ONBOOT=no/ONBOOT=yes/' /etc/sysconfig/networ-scripts/ifcfg-eth0
 
 
 cd /tmp
-wget http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+wget http://download.fedoraproject.org/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm
 rpm -Uvh ./epel-release-5-4.noarch.rpm
-
 yum install git
+
